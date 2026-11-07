@@ -41,6 +41,26 @@ def amazon_search(term: str) -> str:
     return f"https://www.amazon.com/s?k={quote_plus(term)}&tag={TAG}"
 
 
+def amazon_dp(asin: str) -> str:
+    return f"https://www.amazon.com/dp/{asin}?tag={TAG}"
+
+
+# ---------------------------------------------------------------- books (Nick Colorful, KDP)
+# No prices shown on this page (Amazon Program Policies: a price next to a Special Link needs
+# live Creators/PA-API data + a timestamp disclaimer, which this static site doesn't have).
+BOOKS = [
+    dict(id="big-dinosaur", title="Big Dinosaur Coloring Book", age="Ages 4-8", cover="big-dinosaur.jpg",
+         blurb="50 roaring-good dinosaur designs, bold and simple for a first coloring book.",
+         freebie="big-dinosaur.pdf",
+         editions=[("Paperback", "B0HMPQ2JKQ"), ("Hardcover", "B0HN48F9QD")]),
+    dict(id="pet-memorial", title="Pet Memorial Coloring Book", age="For adults", cover="pet-memorial.jpg",
+         blurb="A gentle keepsake for the loss of a dog or cat -- rainbow bridges, paw-print wreaths and "
+               "quiet gardens for a few calm, mindful minutes during grief.",
+         freebie="pet-memorial.pdf", editions=[]),
+]
+DINO_SERIES = [("Danny the Dino", "B0HMSKKWCJ"), ("Daniela the Dino", "B0HMR64RQZ")]
+
+
 # ---------------------------------------------------------------- shop data
 def collections() -> dict[str, list[dict]]:
     out = {"pets": [], "holiday": [], "tiedye": [], "tees": []}
@@ -189,6 +209,7 @@ def page(title: str, desc: str, body: str, root: str, impact: bool = False, cls:
     <a href="{root}index.html#holiday">Holiday</a>
     <a href="{root}index.html#tees">Tees</a>
     <a href="{root}picks/index.html">Picks</a>
+    <a href="{root}books/index.html">Books</a>
     <a class="etsy" href="{ETSY_SHOP}" target="_blank" rel="noopener">Etsy shop &#8599;</a>
   </nav>
 </header>
@@ -271,6 +292,15 @@ def home(c: dict) -> str:
     gear works. <span class="adtag">#ad &middot; affiliate links inside</span></p></div>
   <div class="pks">{picks_cards}</div>
 </section>
+
+<section class="sec" id="books">
+  <div class="sh"><h2>Nick Colorful <em>coloring books</em></h2><p>Free printable samples, plus the full books on
+    Amazon. <span class="adtag">#ad &middot; affiliate links inside</span></p></div>
+  <a class="pk" href="books/index.html">
+    <img src="img/books/{BOOKS[0]['cover']}" alt="" loading="lazy">
+    <div><em>Low-content books</em><h3>{len(BOOKS)} books, free printables</h3><p>See the books &rarr;</p></div>
+  </a>
+</section>
 </main>"""
     return page("DripDrop - custom pet portraits, tees & ugly sweaters",
                 "Turn your dog or cat into a portrait on a tee, canvas or mug. Plus tie-dye, graphic tees, holiday "
@@ -327,6 +357,49 @@ you which specs decide whether the gear works, so you can judge any listing - in
     return page(f"{g['title']} - DripDrop Picks", g["lede"], body, root, cls="pk-page")
 
 
+def books_index() -> str:
+    root = "../"
+
+    def book_card(b: dict) -> str:
+        buys = "".join(
+            f'<a class="btn ghost small" href="{amazon_dp(asin)}" target="_blank" '
+            f'rel="sponsored nofollow noopener">{html.escape(label)} on Amazon &rarr;</a>'
+            for label, asin in b["editions"]
+        ) or '<span class="soon">Coming soon to Amazon</span>'
+        return f"""<article class="book">
+  <img src="../img/books/{b['cover']}" alt="{html.escape(b['title'])} cover" loading="lazy">
+  <div class="tx">
+    <span class="age">{html.escape(b['age'])}</span>
+    <h2>{html.escape(b['title'])}</h2>
+    <p>{html.escape(b['blurb'])}</p>
+    <div class="buys">{buys}</div>
+    <a class="btn small" href="../freebies/{b['freebie']}" target="_blank">Free printable &middot; 3 pages &rarr;</a>
+    <small class="ad">Amazon links are #ad &middot; affiliate links</small>
+  </div>
+</article>"""
+
+    series = "".join(
+        f'<a class="btn ghost small" href="{amazon_dp(asin)}" target="_blank" '
+        f'rel="sponsored nofollow noopener">{html.escape(name)} on Amazon &rarr;</a>'
+        for name, asin in DINO_SERIES
+    )
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">Nick Colorful &middot; coloring books</p><h1>Printable pages,<br><em>then the full book.</em></h1>
+<p class="sub">Low-content coloring books from our imprint Nick Colorful. Grab a free 3-page printable sample
+of each book below, then find the full book on Amazon.</p></section>
+<div class="books">{''.join(book_card(b) for b in BOOKS)}</div>
+<section class="cross"><h3>Also in the Dino Friends series</h3>
+<p>Danny the Dino and Daniela the Dino, same bold toddler-friendly style as Big Dinosaur Coloring Book.</p>
+<div class="buys">{series}</div></section>
+<section class="cross"><h3>While you're here</h3><p>We make custom portraits of your pet on tees, mugs and canvas.</p>
+<a class="btn ghost" href="../index.html#pets">See the pet portraits &rarr;</a></section>
+</main>"""
+    return page("Nick Colorful coloring books - free printables - DripDrop",
+                "Free printable sample pages from our Nick Colorful coloring books, plus links to the full "
+                "books on Amazon.", body, root, cls="pk-page")
+
+
 def disclosure() -> str:
     body = f"""<main class="pmain narrow"><section class="phero"><p class="kick">Disclosure</p><h1>How DripDrop makes money</h1>
 <p class="sub">DripDrop sells its own made-to-order products through Etsy. On DripDrop Picks pages, some links are
@@ -355,9 +428,11 @@ def main() -> None:
         shutil.rmtree(DIST)
     shutil.copytree(SRC / "img", DIST / "img")
     shutil.copytree(SRC / "assets", DIST / "assets")
+    shutil.copytree(SRC / "freebies", DIST / "freebies")
     c = collections()
     files = {"index.html": home(c), "picks/index.html": picks_index(), "disclosure.html": disclosure(),
-             "links/index.html": links_page(c), **{f"picks/{k}.html": guide(k) for k in PICKS}}
+             "links/index.html": links_page(c), "books/index.html": books_index(),
+             **{f"picks/{k}.html": guide(k) for k in PICKS}}
     for rel, text in files.items():
         p = DIST / rel
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -367,6 +442,14 @@ def main() -> None:
     for k in PICKS:
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
+    # books page: Amazon sentence + #ad present, no bare prices, every amazon.com link is sponsored+tagged
+    bt = files["books/index.html"]
+    assert AMAZON_SENTENCE in bt and "#ad" in bt, "books"
+    assert not re.search(r"\$\d", bt), "books page must not show a price next to an Amazon link"
+    for m in re.finditer(r'href="(https://www\.amazon\.com/[^"]+)"[^>]*', bt):
+        assert f"tag={TAG}" in m.group(1), m.group(1)
+    for m in re.finditer(r'<a[^>]+amazon\.com[^>]*>', bt):
+        assert 'rel="sponsored nofollow noopener"' in m.group(0), m.group(0)
     print(f"built {len(files)} pages, {sum(len(v) for v in c.values())} shop items, tag {TAG} -> {DIST}")
 
 

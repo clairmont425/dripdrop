@@ -147,6 +147,19 @@ em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--gold)}
 .cross .btn.ghost{color:var(--cream);border-color:var(--line)}
 @media(max-width:820px){.it{grid-template-columns:1fr}.it:nth-of-type(even) figure{order:0}}
 
+/* books */
+.books{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;margin-top:24px}
+.book{display:flex;flex-direction:column;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 20px 40px -28px rgba(18,18,20,.25)}
+.book img{width:100%;aspect-ratio:3/4;object-fit:cover}
+.book .tx{padding:22px 24px 26px}
+.book .age{font:600 11px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
+.book h2{font:800 26px/1.05 var(--disp);letter-spacing:-.03em;margin:8px 0 10px}
+.book p{color:#4a463f;font-size:15px}
+.book .buys{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 10px}
+.btn.small{padding:9px 16px;font-size:13px}
+.soon{display:inline-block;font-size:13px;color:var(--mute);font-style:italic}
+@media(max-width:760px){.books{grid-template-columns:1fr}}
+
 /* link-in-bio */
 .lk-page .top{display:none}
 .links{max-width:480px;margin:0 auto;padding:56px 18px 40px;text-align:center}
