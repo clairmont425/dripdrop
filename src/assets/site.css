@@ -178,3 +178,16 @@ em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--gold)}
 .fr{display:flex;flex-wrap:wrap;gap:22px;font-size:14px;align-items:flex-start}
 .fr a{opacity:.75}.fr a:hover{opacity:1;color:var(--gold)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rise{opacity:1;transform:none}}
+
+/* free printables */
+.fbook{padding:clamp(32px,4vw,56px) 0;border-top:1px solid rgba(18,18,20,.12)}
+.fhead{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.fhead h2{font:800 clamp(30px,3.4vw,46px)/1 var(--disp);letter-spacing:-.035em;margin:4px 0 6px}
+.fhead p{color:#4a463f}
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.fp{background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 40px -28px rgba(0,0,0,.4)}
+.fp img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px}
+.fp div{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.fp h3{font:700 20px/1.2 var(--body)}
+.fp .btn{background:var(--ink);color:var(--paper);padding:11px 18px}
+@media(max-width:700px){.fgrid{grid-template-columns:1fr}}

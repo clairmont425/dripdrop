@@ -17,6 +17,8 @@ import shutil
 from pathlib import Path
 from urllib.parse import quote_plus
 
+from freebies import BOOKS as FREE_BOOKS
+
 ROOT = Path(__file__).resolve().parent
 SRC, DIST = ROOT / "src", ROOT / "docs"   # GitHub Pages serves main:/docs
 ENV = Path(r"C:/Users/Nico Clairmont/Projects/.env.master")
@@ -35,6 +37,11 @@ def amazon_tag() -> str:
 
 
 TAG = amazon_tag()
+
+
+def amazon_book(b: dict) -> str:
+    """Product page once the ASIN exists; an ISBN search while a new title is still going live."""
+    return f"https://www.amazon.com/dp/{b['asin']}?tag={TAG}" if b["asin"] else amazon_search(b["isbn"])
 
 
 def amazon_search(term: str) -> str:
@@ -210,6 +217,7 @@ def page(title: str, desc: str, body: str, root: str, impact: bool = False, cls:
     <a href="{root}index.html#tees">Tees</a>
     <a href="{root}picks/index.html">Picks</a>
     <a href="{root}books/index.html">Books</a>
+    <a href="{root}free/index.html">Free pages</a>
     <a class="etsy" href="{ETSY_SHOP}" target="_blank" rel="noopener">Etsy shop &#8599;</a>
   </nav>
 </header>
@@ -223,6 +231,7 @@ def page(title: str, desc: str, body: str, root: str, impact: bool = False, cls:
     <a href="{ETSY_SHOP}" target="_blank" rel="noopener">Etsy</a>
     <a href="{IG}" target="_blank" rel="noopener">Instagram</a>
     <a href="{root}picks/index.html">DripDrop Picks</a>
+    <a href="{root}free/index.html">Free coloring pages</a>
     <a href="{root}disclosure.html">Affiliate disclosure</a>
     <a href="https://clairmont425.github.io/clarity-stack/dripdrop-privacy.html">Privacy</a>
   </div>
@@ -400,6 +409,31 @@ of each book below, then find the full book on Amazon.</p></section>
                 "books on Amazon.", body, root, cls="pk-page")
 
 
+def free_page() -> str:
+    root = "../"
+    secs = []
+    for b in FREE_BOOKS:
+        cards = "".join(f"""<div class="fp" id="{slug}">
+  <a href="{slug}.pdf" download><img src="../img/free/{slug}.jpg" alt="{html.escape(label)} coloring page" loading="lazy"></a>
+  <div><h3>{html.escape(label)}</h3><a class="btn" href="{slug}.pdf" download>Download free PDF &darr;</a></div>
+</div>""" for slug, _src, label in b["pages"])
+        secs.append(f"""<section class="fbook" id="{b['key']}">
+  <div class="fhead"><div><em>{html.escape(b['audience'])}</em><h2>{html.escape(b['title'])}</h2><p>{html.escape(b['sub'])}</p></div>
+  <a class="btn ghost" href="{amazon_book(b)}" target="_blank" rel="sponsored nofollow noopener">Get the full book on Amazon &rarr;</a></div>
+  <div class="fgrid">{cards}</div>
+</section>""")
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">Free printables</p><h1>Free coloring pages,<br><em>print and go.</em></h1>
+<p class="sub">Real pages from our coloring books - letter size, free for personal use. If your kid (or you) likes them,
+the full books are on Amazon. Illustrations are AI-assisted and hand-picked.</p></section>
+{''.join(secs)}
+<section class="cross"><h3>Lost a pet recently?</h3><p>We also turn a photo of your dog or cat into a custom portrait tee or canvas.</p>
+<a class="btn ghost" href="../index.html#pets">See the pet portraits &rarr;</a></section>
+</main>"""
+    return page("Free printable coloring pages - DripDrop", "Free printable coloring pages for kids and adults: dinosaurs, Christmas, birthdays and pet memorial pages.", body, root, cls="pk-page")
+
+
 def disclosure() -> str:
     body = f"""<main class="pmain narrow"><section class="phero"><p class="kick">Disclosure</p><h1>How DripDrop makes money</h1>
 <p class="sub">DripDrop sells its own made-to-order products through Etsy. On DripDrop Picks pages, some links are
@@ -416,6 +450,7 @@ def links_page(c: dict) -> str:
     tee = next(l for l in c["pets"] if short(l["title"]) == "Custom Pet Portrait Tee")
     rows = [("Custom pet portrait tee", tee["url"]), ("Ugly Christmas sweaters", "../index.html#holiday"),
             ("Tie-dye & graphic tees", "../index.html#tees"), ("DripDrop Picks: pet gear filters (#ad)", "../picks/index.html"),
+            ("Free printable coloring pages", "../free/index.html"),
             ("Shop everything on Etsy", ETSY_SHOP)]
     btns = "".join(f'<a class="lk" href="{u}">{html.escape(t)}<span>&rarr;</span></a>' for t, u in rows)
     body = f"""<main class="links"><img class="av" src="../img/shop/{tee['id']}_1.jpg" alt="">
@@ -428,10 +463,11 @@ def main() -> None:
         shutil.rmtree(DIST)
     shutil.copytree(SRC / "img", DIST / "img")
     shutil.copytree(SRC / "assets", DIST / "assets")
+    shutil.copytree(SRC / "free", DIST / "free")
     shutil.copytree(SRC / "freebies", DIST / "freebies")
     c = collections()
     files = {"index.html": home(c), "picks/index.html": picks_index(), "disclosure.html": disclosure(),
-             "links/index.html": links_page(c), "books/index.html": books_index(),
+             "links/index.html": links_page(c), "free/index.html": free_page(), "books/index.html": books_index(),
              **{f"picks/{k}.html": guide(k) for k in PICKS}}
     for rel, text in files.items():
         p = DIST / rel
