@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent
 SRC, DIST = ROOT / "src", ROOT / "docs"   # GitHub Pages serves main:/docs
 ENV = Path(r"C:/Users/Nico Clairmont/Projects/.env.master")
 ETSY_SHOP = "https://www.etsy.com/shop/DripDropShopUS"
-IG = "https://www.instagram.com/dripdropshopus/"
+IG = "https://www.instagram.com/dripdropgram/"
 SITE = "https://clairmont425.github.io/dripdrop/"
 IMPACT_META = "<meta name='impact-site-verification' value='78c583fb-7431-465a-86ca-7bddd8836b08'>"
 AMAZON_SENTENCE = "As an Amazon Associate I earn from qualifying purchases."
