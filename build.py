@@ -64,6 +64,15 @@ BOOKS = [
          blurb="A gentle keepsake for the loss of a dog or cat -- rainbow bridges, paw-print wreaths and "
                "quiet gardens for a few calm, mindful minutes during grief.",
          freebie="pet-memorial.pdf", editions=[]),
+    dict(id="big-space", title="Big Space Coloring Book", age="Ages 4-8", cover="big-space.jpg",
+         blurb="50 big, simple astronaut, rocket and planet pictures -- smiling astronauts, friendly aliens "
+               "and shooting stars for a first coloring book.",
+         freebie="big-space.pdf", editions=[]),
+    dict(id="construction-trucks", title="Big Construction Trucks Coloring Book", age="Toddlers 2-4",
+         cover="construction-trucks.jpg",
+         blurb="50 big, extra-simple truck pictures made for little hands -- dump trucks, excavators, "
+               "cranes and cement mixers, one giant friendly subject per page.",
+         freebie="construction-trucks.pdf", editions=[]),
 ]
 DINO_SERIES = [("Danny the Dino", "B0HMSKKWCJ"), ("Daniela the Dino", "B0HMR64RQZ")]
 
