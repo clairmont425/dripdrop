@@ -332,12 +332,20 @@ def picks_index() -> str:
   <div><em>{v['kicker']}</em><h3>{v['title']}</h3><p>{v['lede']}</p>
   <ul>{''.join(f"<li>{i['name']}</li>" for i in v['items'])}</ul></div>
 </a>""" for k, v in PICKS.items())
+    gift_cards = f"""<a class="pk big" href="gifts-for-dog-people.html">
+  <img src="../img/picks/photo_01.jpg" alt="" loading="lazy">
+  <div><em>Gift guide</em><h3>Gifts for dog people</h3><p>Our own pet portraits, plus the dog-gear
+  buying filters.</p></div>
+</a>
+<a class="pk big" href="kitchen-gifts.html">
+  <div><em>{KITCHEN_GIFTS['kicker']}</em><h3>{KITCHEN_GIFTS['title']}</h3><p>{KITCHEN_GIFTS['lede']}</p></div>
+</a>"""
     body = f"""<main class="pmain">
 {disclosure_bar(root)}
 <section class="phero"><p class="kick">DripDrop Picks</p><h1>Buy the spec,<br><em>not the hype.</em></h1>
-<p class="sub">Short buying filters for pet gear. We haven't tested these products - each guide tells you which
-two or three specs decide whether a product works, so you can judge any listing yourself.</p></section>
-<div class="pks two">{cards}</div>
+<p class="sub">Short buying filters for pet gear and gift guides. We haven't tested these products - each guide
+tells you which two or three specs decide whether a product works, so you can judge any listing yourself.</p></section>
+<div class="pks two">{cards}{gift_cards}</div>
 </main>"""
     return page("DripDrop Picks - buying filters for pet gear", "The specs that decide whether pet gear works.",
                 body, root, cls="pk-page")
@@ -454,11 +462,179 @@ because they change - check the retailer.</p></section></main>"""
     return page("Affiliate disclosure - DripDrop", "How DripDrop makes money.", body, "", cls="pk-page")
 
 
+# ---------------------------------------------------------------- gift guides (Black Friday push)
+# Reuses the feeding/walks criteria + existing generic photos (no new image generation needed) for
+# the dog-people guide; the kitchen guide is new content and ships text-only (criteria + search
+# links, same "we have not tested these" pattern as the other picks pages) rather than spend budget
+# on new generic stock photos this run.
+DOG_GIFT_ITEM_IDS = ["slow-feeder", "elevated-feeder", "lick-mat", "puzzle-toy", "harness",
+                     "deshedding", "seat-cover"]
+
+KITCHEN_GIFTS = {
+    "kicker": "Gift guide",
+    "title": "Kitchen gifts",
+    "lede": "Kitchen gear is the best-paying category we carry and the easiest to get wrong as a "
+            "gift. Each one is decided by a spec most listings don't put in the title - here is "
+            "what to check first.",
+    "items": [
+        dict(id="kettle", name="Electric gooseneck kettle", call="Hold temperature, not just boil",
+             check=["A stated hold-temperature feature, not just a kill switch at boiling - that's "
+                    "the difference for pour-over coffee and tea.",
+                    "Gooseneck spout for a controlled pour; a wide spout is the #1 return reason.",
+                    "Stainless or glass interior - avoid unlined non-stick coatings that chip with "
+                    "boiling water."],
+             skip="They already own a stovetop kettle they like - this is an upgrade, not a fix.",
+             term="gooseneck electric kettle variable temperature"),
+        dict(id="knife-set", name="Chef's knife", call="Steel type, then weight in hand",
+             check=["Steel hardness (HRC) printed in the spec sheet - 56-60 HRC holds an edge "
+                    "without being brittle.",
+                    "Full tang construction (the blade metal runs through the handle) for balance "
+                    "and durability.",
+                    "Weight and handle shape fit the cook's hand - a demo video beats a spec sheet "
+                    "here if one exists."],
+             skip="They already have a knife they sharpen and like - a new one won't out-perform a "
+                  "sharp familiar blade.",
+             term="chef knife high carbon steel full tang"),
+        dict(id="cutting-board", name="End-grain cutting board", call="End-grain, then thickness",
+             check=["End-grain construction (the wood fibers face up) - it self-heals and is gentler "
+                    "on knife edges than edge-grain.",
+                    "At least 1.5″ thickness so it doesn't warp.",
+                    "Hardwood species (maple, walnut) rather than a soft wood that dents."],
+             skip="Counter space is tight - a smaller edge-grain board is the more honest gift.",
+             term="end grain cutting board thick hardwood"),
+        dict(id="scale", name="Kitchen scale", call="Resolution, then max capacity",
+             check=["1-gram resolution at minimum - baking recipes depend on it.",
+                    "Stated max capacity that clears a full mixing bowl, not just a cup of flour.",
+                    "A tare/zero button and a removable platform for easy cleaning."],
+             skip="They already measure by cups and have no interest in baking by weight.",
+             term="digital kitchen scale 1 gram resolution"),
+        dict(id="cast-iron", name="Cast iron skillet", call="Pre-seasoned, then weight",
+             check=["Pre-seasoned from the factory, so it's usable on arrival rather than needing a "
+                    "multi-session seasoning process.",
+                    "Weight relative to who's lifting it - a 12″ skillet can run 8+ lbs.",
+                    "A helper handle on larger sizes for a second hand when it's full and hot."],
+             skip="They've said cast iron maintenance isn't for them - a carbon steel pan is the "
+                  "lighter-maintenance alternative, not a reason to skip the gift.",
+             term="pre seasoned cast iron skillet"),
+        dict(id="thermometer", name="Instant-read meat thermometer", call="Read speed, then probe length",
+             check=["Read time under 3 seconds, stated in the spec sheet - slower ones get set down "
+                    "and forgotten.",
+                    "A thin probe tip (under 3mm) for accurate reads in thin cuts like chicken "
+                    "breast.",
+                    "Food-safe temperature range and a calibration function."],
+             skip="They already run a leave-in probe thermometer - an instant-read is a different "
+                  "tool, not an upgrade.",
+             term="instant read meat thermometer fast"),
+        dict(id="sharpener", name="Knife sharpener", call="Angle-guided, not freehand",
+             check=["A fixed-angle guide system if the recipient doesn't already freehand sharpen - "
+                    "it's the difference between a usable edge and a ruined one.",
+                    "Stage count (coarse/medium/fine) matched to how dull their knives actually get.",
+                    "Compatible with the knife steel type they own - some systems struggle with very "
+                    "hard steel."],
+             skip="They already have a whetstone routine they're happy with - don't replace a habit "
+                  "that's working.",
+             term="angle guided knife sharpening system"),
+        dict(id="storage", name="Glass food storage set", call="Lid seal, then stackability",
+             check=["A silicone-gasket lid that's actually described as leak-proof, not just "
+                    "“snap-fit”.",
+                    "Oven and freezer safe glass if that's how they cook - check both, not just one.",
+                    "A stated stacking/nesting system so the set doesn't take over a cabinet."],
+             skip="They already have a set they like - more containers without a matching lid "
+                  "system just adds clutter.",
+             term="glass food storage containers leak proof lids"),
+        dict(id="salad-spinner", name="Salad spinner", call="Pump vs pull cord, then bowl use",
+             check=["Mechanism type - pump-top designs are quieter and easier with one hand than a "
+                    "pull-cord.",
+                    "A bowl that doubles as a serving bowl, so it earns counter space.",
+                    "Capacity relative to household size - a 2-person spinner is too small for a "
+                    "family."],
+             skip="They rarely eat fresh greens - this is a single-use gadget for them.",
+             term="salad spinner pump bowl"),
+    ],
+}
+
+
+def gifts_for_dog_people(c: dict) -> str:
+    root = "../"
+    by_id = {it["id"]: it for it in PICKS["feeding"]["items"] + PICKS["walks"]["items"]}
+    amazon_items = [by_id[i] for i in DOG_GIFT_ITEM_IDS]
+    etsy_ids = ["Custom Pet Portrait Tee", "Oversized Custom Pet Tee", "Custom Pet Portrait Mug",
+                "Custom Pet Portrait Ornament"]
+    etsy_picks = [l for l in c["pets"] if short(l["title"]) in etsy_ids]
+    etsy_cards = "\n".join(card(l, root) for l in etsy_picks)
+    amazon_items_html = []
+    for n, it in enumerate(amazon_items, 1):
+        checks = "".join(f"<li>{html.escape(x)}</li>" for x in it["check"])
+        amazon_items_html.append(f"""<article class="it" id="{it['id']}">
+  <figure><img src="../img/picks/photo_{it['photo']:02d}.jpg" alt="{html.escape(it['name'])} - generic example" loading="lazy">
+    <figcaption>AI-generated photo &middot; generic example, not a specific product</figcaption></figure>
+  <div class="tx">
+    <span class="num">{n:02d}</span>
+    <h2>{html.escape(it['name'])}</h2>
+    <span class="call">{html.escape(it['call'])}</span>
+    <h4>What to check</h4><ul>{checks}</ul>
+    <p class="skip"><b>Skip it if</b> {html.escape(it['skip'])}</p>
+    <a class="btn" href="{amazon_search(it['term'])}" target="_blank" rel="sponsored nofollow noopener">Search Amazon for {html.escape(it['name'].lower())} &rarr;</a>
+    <small class="ad">#ad &middot; affiliate link</small>
+  </div>
+</article>""")
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">Gift guide</p><h1>Gifts for dog people</h1>
+<p class="sub">Start with something we actually make, then the Amazon buying filters for the gear
+that goes with it.</p></section>
+<section class="cross"><h3>Our own products</h3>
+<p>Custom pet portraits, made to order from your dog or cat's photo - our own designs, our own
+photos, shipped through our Etsy shop.</p>
+<div class="grid">{etsy_cards}</div></section>
+<section class="phero"><div class="notest"><b>We have not tested these Amazon products.</b> This
+section is a buying filter, not a review: it tells you which specs decide whether the gear works,
+reusing the same criteria from our <a href="feeding.html">feeding</a> and <a href="walks.html">walks</a>
+guides.</div></section>
+{''.join(amazon_items_html)}
+</main>"""
+    return page("Gifts for dog people - DripDrop", "Custom pet portraits plus a buying filter for "
+                "dog-gear gifts: the specs that decide feeding, walking and grooming gear.", body,
+                root, cls="pk-page")
+
+
+def kitchen_gifts() -> str:
+    root = "../"
+    g = KITCHEN_GIFTS
+    items_html = []
+    for n, it in enumerate(g["items"], 1):
+        checks = "".join(f"<li>{html.escape(x)}</li>" for x in it["check"])
+        items_html.append(f"""<article class="it" id="{it['id']}">
+  <div class="tx">
+    <span class="num">{n:02d}</span>
+    <h2>{html.escape(it['name'])}</h2>
+    <span class="call">{html.escape(it['call'])}</span>
+    <h4>What to check</h4><ul>{checks}</ul>
+    <p class="skip"><b>Skip it if</b> {html.escape(it['skip'])}</p>
+    <a class="btn" href="{amazon_search(it['term'])}" target="_blank" rel="sponsored nofollow noopener">Search Amazon for {html.escape(it['name'].lower())} &rarr;</a>
+    <small class="ad">#ad &middot; affiliate link</small>
+  </div>
+</article>""")
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">{g['kicker']}</p><h1>{g['title']}</h1><p class="sub">{g['lede']}</p>
+<div class="notest"><b>We have not tested these products.</b> This page is a buying filter, not a
+review: it tells you which specs decide whether the gear works, so you can judge any listing -
+including ones we don't link.</div></section>
+{''.join(items_html)}
+<section class="cross"><h3>While you're here</h3><p>We make custom portraits of your pet on tees, mugs and canvas.</p>
+<a class="btn ghost" href="../index.html#pets">See the pet portraits &rarr;</a></section>
+</main>"""
+    return page("Kitchen gifts - DripDrop Picks", g["lede"], body, root, cls="pk-page")
+
+
 def links_page(c: dict) -> str:
     root = "../"
     tee = next(l for l in c["pets"] if short(l["title"]) == "Custom Pet Portrait Tee")
     rows = [("Custom pet portrait tee", tee["url"]), ("Ugly Christmas sweaters", "../index.html#holiday"),
             ("Tie-dye & graphic tees", "../index.html#tees"), ("DripDrop Picks: pet gear filters (#ad)", "../picks/index.html"),
+            ("Gifts for dog people (#ad)", "../picks/gifts-for-dog-people.html"),
+            ("Kitchen gift guide (#ad)", "../picks/kitchen-gifts.html"),
             ("Free printable coloring pages", "../free/index.html"),
             ("Shop everything on Etsy", ETSY_SHOP)]
     btns = "".join(f'<a class="lk" href="{u}">{html.escape(t)}<span>&rarr;</span></a>' for t, u in rows)
@@ -477,6 +653,8 @@ def main() -> None:
     c = collections()
     files = {"index.html": home(c), "picks/index.html": picks_index(), "disclosure.html": disclosure(),
              "links/index.html": links_page(c), "free/index.html": free_page(), "books/index.html": books_index(),
+             "picks/gifts-for-dog-people.html": gifts_for_dog_people(c),
+             "picks/kitchen-gifts.html": kitchen_gifts(),
              **{f"picks/{k}.html": guide(k) for k in PICKS}}
     for rel, text in files.items():
         p = DIST / rel
@@ -485,6 +663,9 @@ def main() -> None:
     (DIST / ".nojekyll").write_text("")
     # every picks page must carry the Amazon sentence, the #ad mark and the not-tested banner
     for k in PICKS:
+        t = files[f"picks/{k}.html"]
+        assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
+    for k in ("gifts-for-dog-people", "kitchen-gifts"):
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
     # books page: Amazon sentence + #ad present, no bare prices, every amazon.com link is sponsored+tagged
