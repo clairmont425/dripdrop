@@ -477,7 +477,7 @@ KITCHEN_GIFTS = {
             "gift. Each one is decided by a spec most listings don't put in the title - here is "
             "what to check first.",
     "items": [
-        dict(id="kettle", name="Electric gooseneck kettle", call="Hold temperature, not just boil",
+        dict(id="kettle", name="Electric gooseneck kettle", call="Hold temperature, not just boil", photo=11,
              check=["A stated hold-temperature feature, not just a kill switch at boiling - that's "
                     "the difference for pour-over coffee and tea.",
                     "Gooseneck spout for a controlled pour; a wide spout is the #1 return reason.",
@@ -485,7 +485,7 @@ KITCHEN_GIFTS = {
                     "boiling water."],
              skip="They already own a stovetop kettle they like - this is an upgrade, not a fix.",
              term="gooseneck electric kettle variable temperature"),
-        dict(id="knife-set", name="Chef's knife", call="Steel type, then weight in hand",
+        dict(id="knife-set", name="Chef's knife", call="Steel type, then weight in hand", photo=12,
              check=["Steel hardness (HRC) printed in the spec sheet - 56-60 HRC holds an edge "
                     "without being brittle.",
                     "Full tang construction (the blade metal runs through the handle) for balance "
@@ -495,20 +495,20 @@ KITCHEN_GIFTS = {
              skip="They already have a knife they sharpen and like - a new one won't out-perform a "
                   "sharp familiar blade.",
              term="chef knife high carbon steel full tang"),
-        dict(id="cutting-board", name="End-grain cutting board", call="End-grain, then thickness",
+        dict(id="cutting-board", name="End-grain cutting board", call="End-grain, then thickness", photo=13,
              check=["End-grain construction (the wood fibers face up) - it self-heals and is gentler "
                     "on knife edges than edge-grain.",
                     "At least 1.5″ thickness so it doesn't warp.",
                     "Hardwood species (maple, walnut) rather than a soft wood that dents."],
              skip="Counter space is tight - a smaller edge-grain board is the more honest gift.",
              term="end grain cutting board thick hardwood"),
-        dict(id="scale", name="Kitchen scale", call="Resolution, then max capacity",
+        dict(id="scale", name="Kitchen scale", call="Resolution, then max capacity", photo=14,
              check=["1-gram resolution at minimum - baking recipes depend on it.",
                     "Stated max capacity that clears a full mixing bowl, not just a cup of flour.",
                     "A tare/zero button and a removable platform for easy cleaning."],
              skip="They already measure by cups and have no interest in baking by weight.",
              term="digital kitchen scale 1 gram resolution"),
-        dict(id="cast-iron", name="Cast iron skillet", call="Pre-seasoned, then weight",
+        dict(id="cast-iron", name="Cast iron skillet", call="Pre-seasoned, then weight", photo=15,
              check=["Pre-seasoned from the factory, so it's usable on arrival rather than needing a "
                     "multi-session seasoning process.",
                     "Weight relative to who's lifting it - a 12″ skillet can run 8+ lbs.",
@@ -516,7 +516,7 @@ KITCHEN_GIFTS = {
              skip="They've said cast iron maintenance isn't for them - a carbon steel pan is the "
                   "lighter-maintenance alternative, not a reason to skip the gift.",
              term="pre seasoned cast iron skillet"),
-        dict(id="thermometer", name="Instant-read meat thermometer", call="Read speed, then probe length",
+        dict(id="thermometer", name="Instant-read meat thermometer", call="Read speed, then probe length", photo=16,
              check=["Read time under 3 seconds, stated in the spec sheet - slower ones get set down "
                     "and forgotten.",
                     "A thin probe tip (under 3mm) for accurate reads in thin cuts like chicken "
@@ -525,7 +525,7 @@ KITCHEN_GIFTS = {
              skip="They already run a leave-in probe thermometer - an instant-read is a different "
                   "tool, not an upgrade.",
              term="instant read meat thermometer fast"),
-        dict(id="sharpener", name="Knife sharpener", call="Angle-guided, not freehand",
+        dict(id="sharpener", name="Knife sharpener", call="Angle-guided, not freehand", photo=17,
              check=["A fixed-angle guide system if the recipient doesn't already freehand sharpen - "
                     "it's the difference between a usable edge and a ruined one.",
                     "Stage count (coarse/medium/fine) matched to how dull their knives actually get.",
@@ -534,7 +534,7 @@ KITCHEN_GIFTS = {
              skip="They already have a whetstone routine they're happy with - don't replace a habit "
                   "that's working.",
              term="angle guided knife sharpening system"),
-        dict(id="storage", name="Glass food storage set", call="Lid seal, then stackability",
+        dict(id="storage", name="Glass food storage set", call="Lid seal, then stackability", photo=18,
              check=["A silicone-gasket lid that's actually described as leak-proof, not just "
                     "“snap-fit”.",
                     "Oven and freezer safe glass if that's how they cook - check both, not just one.",
@@ -542,7 +542,7 @@ KITCHEN_GIFTS = {
              skip="They already have a set they like - more containers without a matching lid "
                   "system just adds clutter.",
              term="glass food storage containers leak proof lids"),
-        dict(id="salad-spinner", name="Salad spinner", call="Pump vs pull cord, then bowl use",
+        dict(id="salad-spinner", name="Salad spinner", call="Pump vs pull cord, then bowl use", photo=19,
              check=["Mechanism type - pump-top designs are quieter and easier with one hand than a "
                     "pull-cord.",
                     "A bowl that doubles as a serving bowl, so it earns counter space.",
@@ -605,6 +605,8 @@ def kitchen_gifts() -> str:
     for n, it in enumerate(g["items"], 1):
         checks = "".join(f"<li>{html.escape(x)}</li>" for x in it["check"])
         items_html.append(f"""<article class="it" id="{it['id']}">
+  <figure><img src="../img/picks/photo_{it['photo']:02d}.jpg" alt="{html.escape(it['name'])} - generic example" loading="lazy">
+    <figcaption>AI-generated photo &middot; generic example, not a specific product</figcaption></figure>
   <div class="tx">
     <span class="num">{n:02d}</span>
     <h2>{html.escape(it['name'])}</h2>
