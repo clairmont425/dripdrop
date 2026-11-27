@@ -338,7 +338,12 @@ def picks_index() -> str:
   buying filters.</p></div>
 </a>
 <a class="pk big" href="kitchen-gifts.html">
+  <img src="../img/picks/photo_11.jpg" alt="" loading="lazy">
   <div><em>{KITCHEN_GIFTS['kicker']}</em><h3>{KITCHEN_GIFTS['title']}</h3><p>{KITCHEN_GIFTS['lede']}</p></div>
+</a>
+<a class="pk big" href="home-organization.html">
+  <img src="../img/picks/photo_20.jpg" alt="" loading="lazy">
+  <div><em>{HOME_GIFTS['kicker']}</em><h3>{HOME_GIFTS['title']}</h3><p>{HOME_GIFTS['lede']}</p></div>
 </a>"""
     body = f"""<main class="pmain">
 {disclosure_bar(root)}
@@ -554,6 +559,125 @@ KITCHEN_GIFTS = {
 }
 
 
+HOME_GIFTS = {
+    "kicker": "Gift guide",
+    "title": "Home organization gifts",
+    "lede": "Storage and organizing gear looks the same across price points in a photo. These are "
+            "the specs that actually decide whether it gets used after the first week.",
+    "items": [
+        dict(id="clear-bins", name="Stackable clear storage bins", call="Clarity, then a rated stack height",
+             photo=20,
+             check=["Clear (not frosted) plastic so contents are visible without opening the lid.",
+                    "A stated stack-load rating, not just \"stackable\" - that's what keeps a bottom "
+                    "bin from cracking.",
+                    "A lid that locks or snaps on all sides, not just two tabs."],
+             skip="Everything is already in matching bins from one set - mixing sizes undoes the point.",
+             term="stackable clear storage bins with lids"),
+        dict(id="vacuum-bags", name="Vacuum storage bags", call="Valve type, then bag thickness", photo=21,
+             check=["A one-way valve rated for a specific pump or vacuum hose size.",
+                    "Stated bag thickness in microns - thin bags puncture on sharp zipper teeth.",
+                    "A double-zip seal track, which is the actual leak point on cheap versions."],
+             skip="The items are down/feather-filled - vacuum compression can damage the fill long-term.",
+             term="vacuum storage bags double zip valve"),
+        dict(id="drawer-organizer", name="Adjustable drawer organizer", call="Expansion range, then material",
+             photo=22,
+             check=["A stated expansion range in inches that actually matches the drawer, not just "
+                    "\"adjustable\".",
+                    "Bamboo or solid plastic dividers rather than thin mesh that sags under folded "
+                    "clothes.",
+                    "Divider height tall enough for what's going in it - socks need less than sweaters."],
+             skip="The drawer is an odd shape (corner unit, shallow pan) - a tray won't adjust to that.",
+             term="adjustable drawer organizer dividers"),
+        dict(id="door-organizer", name="Over-the-door organizer", call="Weight-per-pocket, then hook depth",
+             photo=23,
+             check=["A stated weight capacity per pocket, not just a total - one heavy item can tear a "
+                    "light pocket.",
+                    "Hook depth matched to the door thickness, so it doesn't block the door from "
+                    "closing.",
+                    "Clear pockets if it's for anything you need to find by sight."],
+             skip="The door swings into a tight space - check clearance before anything else.",
+             term="over the door hanging organizer pockets"),
+        dict(id="closet-rod", name="Closet double-hang rod", call="Load rating, then adjustable width",
+             photo=24,
+             check=["A stated load rating in pounds for the rod itself, separate from the bracket "
+                    "rating.",
+                    "An adjustable width range that matches the closet, not a fixed size.",
+                    "Mounting hardware rated for the wall or closet material it's going into."],
+             skip="The closet rod is load-bearing from the original build - don't add a hanging unit "
+                  "to it without checking first.",
+             term="closet double hang rod adjustable"),
+        dict(id="label-maker", name="Label maker", call="Tape width options, then power source", photo=25,
+             check=["Multiple tape width options if labeling anything beyond standard bins (spice "
+                    "jars need a narrower tape than file folders).",
+                    "Battery life or a rechargeable port stated, not just \"portable\".",
+                    "A built-in font/size preview screen rather than a tiny one-line display."],
+             skip="It's a one-time project - a marker and painter's tape labels just as well for a "
+                  "single pass.",
+             term="label maker machine with tape"),
+        dict(id="underbed-bins", name="Underbed storage bins with wheels", call="Clearance height, then wheel type",
+             photo=26,
+             check=["Measured clearance under the bed frame, compared with the bin's stated height - "
+                    "this is the #1 return reason.",
+                    "Wheel type: locking casters if the floor has any slope, plain wheels otherwise.",
+                    "A lid that latches, so pulling it out doesn't spill the contents."],
+             skip="The bed frame has drawers built in already - a rolling bin will just compete for "
+                  "the same space.",
+             term="underbed storage bins with wheels low profile"),
+        dict(id="pantry-turntable", name="Pantry turntable / lazy susan", call="Diameter, then weight rating",
+             photo=27,
+             check=["Diameter measured against the actual shelf depth, with room to spin without "
+                    "hitting the shelf above.",
+                    "A stated weight capacity - glass jars add up faster than it looks.",
+                    "A raised lip or divider if it's for loose bottles rather than boxed goods."],
+             skip="The shelf is too shallow for anything to spin freely - a stepped shelf riser is the "
+                  "better fit.",
+             term="pantry lazy susan turntable"),
+        dict(id="cable-box", name="Cable management box", call="Ventilation, then size for the power strip",
+             photo=28,
+             check=["Ventilation slots or cutouts - an enclosed box with a power strip inside can trap "
+                    "heat.",
+                    "Interior dimensions checked against the actual power strip and brick sizes, not "
+                    "just \"fits most\".",
+                    "Cord entry points on the sides, not just the back, if it sits against a wall."],
+             skip="The setup already uses a cable sleeve or raceway that's working - don't add a second "
+                  "system on top.",
+             term="cable management box power strip"),
+    ],
+}
+
+
+def home_organization() -> str:
+    root = "../"
+    g = HOME_GIFTS
+    items_html = []
+    for n, it in enumerate(g["items"], 1):
+        checks = "".join(f"<li>{html.escape(x)}</li>" for x in it["check"])
+        items_html.append(f"""<article class="it" id="{it['id']}">
+  <figure><img src="../img/picks/photo_{it['photo']:02d}.jpg" alt="{html.escape(it['name'])} - generic example" loading="lazy">
+    <figcaption>AI-generated photo &middot; generic example, not a specific product</figcaption></figure>
+  <div class="tx">
+    <span class="num">{n:02d}</span>
+    <h2>{html.escape(it['name'])}</h2>
+    <span class="call">{html.escape(it['call'])}</span>
+    <h4>What to check</h4><ul>{checks}</ul>
+    <p class="skip"><b>Skip it if</b> {html.escape(it['skip'])}</p>
+    <a class="btn" href="{amazon_search(it['term'])}" target="_blank" rel="sponsored nofollow noopener">Search Amazon for {html.escape(it['name'].lower())} &rarr;</a>
+    <small class="ad">#ad &middot; affiliate link</small>
+  </div>
+</article>""")
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">{g['kicker']}</p><h1>{g['title']}</h1><p class="sub">{g['lede']}</p>
+<div class="notest"><b>We have not tested these products.</b> This page is a buying filter, not a
+review: it tells you which specs decide whether the gear works, so you can judge any listing -
+including ones we don't link.</div></section>
+{''.join(items_html)}
+<section class="cross"><h3>While you're here</h3><p>We make custom portraits of your pet on tees, mugs and canvas.</p>
+<a class="btn ghost" href="../index.html#pets">See the pet portraits &rarr;</a></section>
+</main>"""
+    return page("Home organization gifts - DripDrop Picks", g["lede"], body, root, cls="pk-page")
+
+
 def gifts_for_dog_people(c: dict) -> str:
     root = "../"
     by_id = {it["id"]: it for it in PICKS["feeding"]["items"] + PICKS["walks"]["items"]}
@@ -637,6 +761,7 @@ def links_page(c: dict) -> str:
             ("Tie-dye & graphic tees", "../index.html#tees"), ("DripDrop Picks: pet gear filters (#ad)", "../picks/index.html"),
             ("Gifts for dog people (#ad)", "../picks/gifts-for-dog-people.html"),
             ("Kitchen gift guide (#ad)", "../picks/kitchen-gifts.html"),
+            ("Home organization gift guide (#ad)", "../picks/home-organization.html"),
             ("Free printable coloring pages", "../free/index.html"),
             ("Shop everything on Etsy", ETSY_SHOP)]
     btns = "".join(f'<a class="lk" href="{u}">{html.escape(t)}<span>&rarr;</span></a>' for t, u in rows)
@@ -657,6 +782,7 @@ def main() -> None:
              "links/index.html": links_page(c), "free/index.html": free_page(), "books/index.html": books_index(),
              "picks/gifts-for-dog-people.html": gifts_for_dog_people(c),
              "picks/kitchen-gifts.html": kitchen_gifts(),
+             "picks/home-organization.html": home_organization(),
              **{f"picks/{k}.html": guide(k) for k in PICKS}}
     for rel, text in files.items():
         p = DIST / rel
@@ -667,7 +793,7 @@ def main() -> None:
     for k in PICKS:
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
-    for k in ("gifts-for-dog-people", "kitchen-gifts"):
+    for k in ("gifts-for-dog-people", "kitchen-gifts", "home-organization"):
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
     # books page: Amazon sentence + #ad present, no bare prices, every amazon.com link is sponsored+tagged
