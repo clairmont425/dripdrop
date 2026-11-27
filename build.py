@@ -789,6 +789,13 @@ def main() -> None:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(text, encoding="utf-8")
     (DIST / ".nojekyll").write_text("")
+    sitemap_urls = [SITE + ("" if rel == "index.html" else rel.replace("index.html", "")) for rel in files]
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               + "".join(f"  <url><loc>{u}</loc></url>\n" for u in sitemap_urls)
+               + "</urlset>\n")
+    (DIST / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    (DIST / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE}sitemap.xml\n", encoding="utf-8")
     # every picks page must carry the Amazon sentence, the #ad mark and the not-tested banner
     for k in PICKS:
         t = files[f"picks/{k}.html"]
