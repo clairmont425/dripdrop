@@ -344,6 +344,11 @@ def picks_index() -> str:
 <a class="pk big" href="home-organization.html">
   <img src="../img/picks/photo_20.jpg" alt="" loading="lazy">
   <div><em>{HOME_GIFTS['kicker']}</em><h3>{HOME_GIFTS['title']}</h3><p>{HOME_GIFTS['lede']}</p></div>
+</a>
+<a class="pk big" href="last-minute-gifts.html">
+  <img src="../img/picks/photo_15.jpg" alt="" loading="lazy">
+  <div><em>Gift guide &middot; last-minute</em><h3>Last-minute gift guide</h3><p>One pick each for the
+  dog person, the cook, the organizer and the creator.</p></div>
 </a>"""
     body = f"""<main class="pmain">
 {disclosure_bar(root)}
@@ -646,6 +651,69 @@ HOME_GIFTS = {
 }
 
 
+# ---------------------------------------------------------------- last-minute holiday gift guide
+# WIDE_NET.md niche #6: the 1-20 Dec "late gift" surge, reusing items + photos already built for the
+# other four guides - $0 marginal cost, new combinable content for the Pinterest surge window.
+def last_minute_gifts(c: dict) -> str:
+    root = "../"
+    feed_walk = {it["id"]: it for it in PICKS["feeding"]["items"] + PICKS["walks"]["items"]}
+    kitchen_by_id = {it["id"]: it for it in KITCHEN_GIFTS["items"]}
+    home_by_id = {it["id"]: it for it in HOME_GIFTS["items"]}
+    tee = next(l for l in c["pets"] if short(l["title"]) == "Custom Pet Portrait Tee")
+
+    def amazon_card(it: dict) -> str:
+        checks = "".join(f"<li>{html.escape(x)}</li>" for x in it["check"][:2])
+        return f"""<article class="it sm" id="{it['id']}">
+  <figure><img src="../img/picks/photo_{it['photo']:02d}.jpg" alt="{html.escape(it['name'])} - generic example" loading="lazy">
+    <figcaption>AI-generated photo &middot; generic example, not a specific product</figcaption></figure>
+  <div class="tx">
+    <h2>{html.escape(it['name'])}</h2>
+    <span class="call">{html.escape(it['call'])}</span>
+    <ul>{checks}</ul>
+    <a class="btn" href="{amazon_search(it['term'])}" target="_blank" rel="sponsored nofollow noopener">Search Amazon for {html.escape(it['name'].lower())} &rarr;</a>
+    <small class="ad">#ad &middot; affiliate link</small>
+  </div>
+</article>"""
+
+    dog_section = f"""<section class="cross"><h3>For the dog person</h3>
+<p>Start with something we make, then two gear picks that solve a real problem fast.</p>
+<div class="grid">{card(tee, root)}</div></section>
+{amazon_card(feed_walk['slow-feeder'])}{amazon_card(feed_walk['harness'])}"""
+
+    cook_section = f"""<section class="cross"><h3>For the cook</h3>
+<p>Kitchen gear is the easiest category to get wrong as a gift - these two are decided by one spec each.
+See the full <a href="kitchen-gifts.html">kitchen gift guide &rarr;</a></p></section>
+{amazon_card(kitchen_by_id['cast-iron'])}{amazon_card(kitchen_by_id['thermometer'])}"""
+
+    organizer_section = f"""<section class="cross"><h3>For the home organizer</h3>
+<p>Small, giftable, and used the same week - unlike a lot of organizing gear. See the full
+<a href="home-organization.html">home organization guide &rarr;</a></p></section>
+{amazon_card(home_by_id['clear-bins'])}{amazon_card(home_by_id['label-maker'])}"""
+
+    creator_section = """<section class="cross"><h3>For the creator</h3>
+<p>Mic and light picks, by the spec that matters - not a claimed-use list. On our Clarity Stack site:
+<a href="https://clairmont425.github.io/clarity-stack/gear/gifts-for-video-creators.html" target="_blank"
+rel="noopener">gifts for video creators &rarr;</a></p></section>"""
+
+    body = f"""<main class="pmain">
+{disclosure_bar(root)}
+<section class="phero"><p class="kick">Gift guide &middot; last-minute</p><h1>Still shopping?<br><em>Here's where to start.</em></h1>
+<p class="sub">Four categories, one pick each, chosen by the spec that actually matters - not the one on the
+box. Check each retailer's own shipping cutoff for your zip code; we don't control carrier timing.</p>
+<div class="notest"><b>We have not tested the Amazon products below.</b> Each one tells you which spec
+decides whether it works, so you can judge any listing - including ones we don't link.</div></section>
+{dog_section}
+{cook_section}
+{organizer_section}
+{creator_section}
+<section class="cross"><h3>While you're here</h3><p>We make custom portraits of your pet on tees, mugs and canvas.</p>
+<a class="btn ghost" href="../index.html#pets">See the pet portraits &rarr;</a></section>
+</main>"""
+    return page("Last-minute gift guide - DripDrop Picks",
+                "Four quick gift picks - dog person, cook, home organizer, creator - chosen by the one "
+                "spec that decides whether each one works.", body, root, cls="pk-page")
+
+
 def home_organization() -> str:
     root = "../"
     g = HOME_GIFTS
@@ -762,6 +830,7 @@ def links_page(c: dict) -> str:
             ("Gifts for dog people (#ad)", "../picks/gifts-for-dog-people.html"),
             ("Kitchen gift guide (#ad)", "../picks/kitchen-gifts.html"),
             ("Home organization gift guide (#ad)", "../picks/home-organization.html"),
+            ("Last-minute gift guide (#ad)", "../picks/last-minute-gifts.html"),
             ("Free printable coloring pages", "../free/index.html"),
             ("Shop everything on Etsy", ETSY_SHOP)]
     btns = "".join(f'<a class="lk" href="{u}">{html.escape(t)}<span>&rarr;</span></a>' for t, u in rows)
@@ -783,6 +852,7 @@ def main() -> None:
              "picks/gifts-for-dog-people.html": gifts_for_dog_people(c),
              "picks/kitchen-gifts.html": kitchen_gifts(),
              "picks/home-organization.html": home_organization(),
+             "picks/last-minute-gifts.html": last_minute_gifts(c),
              **{f"picks/{k}.html": guide(k) for k in PICKS}}
     for rel, text in files.items():
         p = DIST / rel
@@ -800,7 +870,7 @@ def main() -> None:
     for k in PICKS:
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
-    for k in ("gifts-for-dog-people", "kitchen-gifts", "home-organization"):
+    for k in ("gifts-for-dog-people", "kitchen-gifts", "home-organization", "last-minute-gifts"):
         t = files[f"picks/{k}.html"]
         assert AMAZON_SENTENCE in t and "#ad" in t and "We have not tested" in t and f"tag={TAG}" in t, k
     # books page: Amazon sentence + #ad present, no bare prices, every amazon.com link is sponsored+tagged
